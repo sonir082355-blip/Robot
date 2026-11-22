@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>मित्र रोबोट</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#101b40,#263e75);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.robot {
+  font-size: 85px;
+  margin-top: 20px;
+}
+h1 { color: #65eaff; }
+.chat {
+  background: white;
+  color: #17213d;
+  padding: 15px;
+  border-radius: 18px;
+  min-height: 160px;
+  margin: 20px auto;
+  max-width: 450px;
+  text-align: left;
+}
+input {
+  width: 85%;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+}
+button {
+  padding: 13px 18px;
+  margin: 7px;
+  border: 0;
+  border-radius: 12px;
+  background: #00c9e8;
+  font-size: 16px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🤖 मित्र रोबोट</h1>
+<div class="robot">🤖</div>
+<p>नमस्ते! मैं तुम्हारा दोस्त मित्र हूँ।</p>
+
+<div class="chat" id="chat">
+  <b>मित्र:</b> नमस्ते दोस्त! मुझसे कुछ पूछो। 😊
+</div>
+
+<input id="question" placeholder="अपना सवाल लिखो...">
+
+<br>
+<button onclick="ask()">पूछो</button>
+<button onclick="listen()">🎤 बोलकर पूछो</button>
+<button onclick="stopVoice()">🔇 आवाज बंद</button>
+
+<script>
+function answer(q) {
+  q = q.toLowerCase();
+
+  if(q.includes("नमस्ते") || q.includes("हेलो"))
+    return "नमस्ते दोस्त! मैं मित्र रोबोट हूँ।";
+
+  if(q.includes("नाम"))
+    return "मेरा नाम मित्र है। तुम्हारा प्यारा रोबोट!";
+
+  if(q.includes("तुम कौन"))
+    return "मैं मित्र हूँ। तुम्हारा छोटा वैज्ञानिक दोस्त!";
+
+  if(q.includes("पृथ्वी"))
+    return "पृथ्वी हमारा घर है। यहाँ जीवन पाया जाता है।";
+
+  if(q.includes("मंगल"))
+    return "मंगल एक लाल ग्रह है। वैज्ञानिक वहाँ जीवन के संकेत खोज रहे हैं।";
+
+  if(q.includes("सूर्य"))
+    return "सूर्य एक तारा है और हमें रोशनी तथा गर्मी देता है।";
+
+  if(q.includes("चाँद") || q.includes("चंद्रमा"))
+    return "चंद्रमा पृथ्वी का प्राकृतिक उपग्रह है।";
+
+  if(q.includes("वैज्ञानिक"))
+    return "वैज्ञानिक सवाल पूछते हैं, प्रयोग करते हैं और नई खोज करते हैं।";
+
+  if(q.includes("धन्यवाद"))
+    return "अरे दोस्त! धन्यवाद की क्या जरूरत है!";
+
+  if(q.includes("मित्र"))
+    return "जी दोस्त! बताओ, क्या पूछना है?";
+
+  return "माफ करना दोस्त! मुझे इसका जवाब अभी नहीं पता। चलो इसे मिलकर सीखते हैं।";
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("इस ब्राउज़र में आवाज की सुविधा नहीं है।");
+    return;
+  }
+  speechSynthesis.cancel();
+  let msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "hi-IN";
+  msg.rate = 0.9;
+  msg.pitch = 1.5;
+  speechSynthesis.speak(msg);
+}
+
+function ask() {
+  let input = document.getElementById("question");
+  let q = input.value.trim();
+  if(!q) return;
+
+  let reply = answer(q);
+  document.getElementById("chat").innerHTML =
+    "<b>तुम:</b> " + escapeHTML(q) +
+    "<br><br><b>मित्र:</b> " + escapeHTML(reply);
+
+  speak(reply);
+  input.value = "";
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function listen() {
+  let SR = window.SpeechRecognition ||
+           window.webkitSpeechRecognition;
+
+  if(!SR) {
+    alert("आवाज पहचानने के लिए Chrome में कोशिश करो।");
+    return;
+  }
+
+  let recognition = new SR();
+  recognition.lang = "hi-IN";
+  recognition.onresult = function(event) {
+    document.getElementById("question").value =
+      event.results[0][0].transcript;
+    ask();
+  };
+  recognition.onerror = function() {
+    alert("आवाज नहीं सुनाई दी। फिर से कोशिश करो।");
+  };
+  recognition.start();
+}
+
+function stopVoice() {
+  if ("speechSynthesis" in window)
+    speechSynthesis.cancel();
+}
+</script>
+
+</body>
+</html>
